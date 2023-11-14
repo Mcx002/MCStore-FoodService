@@ -1,0 +1,10 @@
+.idea
+node_modules
+coverage
+
+.env
+error.log
+.vscode
+.env.production
+error.log
+info.log
