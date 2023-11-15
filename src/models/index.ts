@@ -1,8 +1,8 @@
-import { Collection, Db, MongoClient } from 'mongodb'
-import { FoodCreationAttributes, initFoodCollectionIndices } from './food.model'
+import { Collection, Db, MongoClient, Document } from 'mongodb'
+import { FoodModel, initFoodCollectionIndices } from './food.model'
 import { appConfig } from '../config'
 
-export interface BaseAttributes {
+export interface BaseAttributes extends Document {
     createdAt: Date
     updatedAt: Date
     version: number
@@ -17,7 +17,7 @@ export const createBaseAttributes = (): BaseAttributes => {
 }
 
 export class DatabaseModels {
-    foodCollection: Collection
+    foodCollection: Collection<FoodModel>
 
     constructor(db: Db) {
         this.foodCollection = initFoodCollectionIndices(db)
