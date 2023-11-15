@@ -1,4 +1,5 @@
-import { Collection, Db, OptionalId } from 'mongodb'
+import { Collection, Db, OptionalId, WithId } from 'mongodb'
+import { BaseAttributes } from '.'
 
 export interface FoodDetail {
     calories: number
@@ -6,7 +7,7 @@ export interface FoodDetail {
     sugar: number
 }
 
-interface Food {
+interface Food extends BaseAttributes {
     name: string
     images: string[]
     price: number
@@ -14,7 +15,8 @@ interface Food {
     detail: FoodDetail
 }
 
-export type FoodModel = OptionalId<Food>
+export type FoodCreationAttributes = OptionalId<Food>
+export type FoodAttributes = WithId<Food>
 
 export const FOOD_COLLECTION = 'food'
 
