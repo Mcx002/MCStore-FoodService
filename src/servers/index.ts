@@ -17,7 +17,9 @@ export class AppServer extends Server {
         // Auth Service Route
         this.addService(FoodService, {
             getHealth: this.commonServer.getHealth,
+
             createFood: this.foodServer.createFood,
+            getFoodById: this.foodServer.getFoodById,
         })
     }
 }
