@@ -109,7 +109,10 @@ proto.food.FoodDto.toObject = function(includeInstance, msg) {
     imagesList: (f = jspb.Message.getRepeatedField(msg, 3)) == null ? undefined : f,
     price: jspb.Message.getFieldWithDefault(msg, 4, 0),
     qty: jspb.Message.getFieldWithDefault(msg, 5, 0),
-    detail: (f = msg.getDetail()) && proto.food.FoodDto.Detail.toObject(includeInstance, f)
+    detail: (f = msg.getDetail()) && proto.food.FoodDto.Detail.toObject(includeInstance, f),
+    createdAt: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    updatedAt: jspb.Message.getFieldWithDefault(msg, 8, 0),
+    version: jspb.Message.getFieldWithDefault(msg, 9, 0)
   };
 
   if (includeInstance) {
@@ -170,6 +173,18 @@ proto.food.FoodDto.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto.food.FoodDto.Detail;
       reader.readMessage(value,proto.food.FoodDto.Detail.deserializeBinaryFromReader);
       msg.setDetail(value);
+      break;
+    case 7:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setCreatedAt(value);
+      break;
+    case 8:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setUpdatedAt(value);
+      break;
+    case 9:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setVersion(value);
       break;
     default:
       reader.skipField();
@@ -241,6 +256,27 @@ proto.food.FoodDto.serializeBinaryToWriter = function(message, writer) {
       6,
       f,
       proto.food.FoodDto.Detail.serializeBinaryToWriter
+    );
+  }
+  f = message.getCreatedAt();
+  if (f !== 0) {
+    writer.writeInt64(
+      7,
+      f
+    );
+  }
+  f = message.getUpdatedAt();
+  if (f !== 0) {
+    writer.writeInt64(
+      8,
+      f
+    );
+  }
+  f = message.getVersion();
+  if (f !== 0) {
+    writer.writeInt32(
+      9,
+      f
     );
   }
 };
@@ -582,6 +618,60 @@ proto.food.FoodDto.prototype.clearDetail = function() {
  */
 proto.food.FoodDto.prototype.hasDetail = function() {
   return jspb.Message.getField(this, 6) != null;
+};
+
+
+/**
+ * optional int64 created_at = 7;
+ * @return {number}
+ */
+proto.food.FoodDto.prototype.getCreatedAt = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.food.FoodDto} returns this
+ */
+proto.food.FoodDto.prototype.setCreatedAt = function(value) {
+  return jspb.Message.setProto3IntField(this, 7, value);
+};
+
+
+/**
+ * optional int64 updated_at = 8;
+ * @return {number}
+ */
+proto.food.FoodDto.prototype.getUpdatedAt = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.food.FoodDto} returns this
+ */
+proto.food.FoodDto.prototype.setUpdatedAt = function(value) {
+  return jspb.Message.setProto3IntField(this, 8, value);
+};
+
+
+/**
+ * optional int32 version = 9;
+ * @return {number}
+ */
+proto.food.FoodDto.prototype.getVersion = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.food.FoodDto} returns this
+ */
+proto.food.FoodDto.prototype.setVersion = function(value) {
+  return jspb.Message.setProto3IntField(this, 9, value);
 };
 
 

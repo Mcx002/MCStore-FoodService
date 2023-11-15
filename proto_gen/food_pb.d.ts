@@ -24,6 +24,12 @@ export class FoodDto extends jspb.Message {
     clearDetail(): void;
     getDetail(): FoodDto.Detail | undefined;
     setDetail(value?: FoodDto.Detail): FoodDto;
+    getCreatedAt(): number;
+    setCreatedAt(value: number): FoodDto;
+    getUpdatedAt(): number;
+    setUpdatedAt(value: number): FoodDto;
+    getVersion(): number;
+    setVersion(value: number): FoodDto;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): FoodDto.AsObject;
@@ -43,6 +49,9 @@ export namespace FoodDto {
         price: number,
         qty: number,
         detail?: FoodDto.Detail.AsObject,
+        createdAt: number,
+        updatedAt: number,
+        version: number,
     }
 
 
