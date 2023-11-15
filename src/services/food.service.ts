@@ -2,10 +2,11 @@ import { App } from '../app'
 import { BaseService } from '../interfaces/service.interface'
 import { FoodAttributes, FoodCreationAttributes } from '../models/food.model'
 import { FoodRepository } from '../repositories/food.repository'
-import { FoodDto } from '../../proto_gen/food_pb'
+import { FoodDto, ListFoodDto } from '../../proto_gen/food_pb'
 import { ErrorHandler } from '../adapter/error.adapter'
 import { Status } from '@grpc/grpc-js/build/src/constants'
 import { getUnixFromDate } from '../utils/time'
+import { ListMetadata, ListOptions } from '../../proto_gen/common_pb'
 
 export class FoodService extends BaseService {
     foodRepo!: FoodRepository
@@ -44,6 +45,7 @@ export class FoodService extends BaseService {
             createdAt: new Date(),
             updatedAt: new Date(),
             version: 1,
+            visible: payload.getVisible()
         }
 
         // execute insert
@@ -85,5 +87,28 @@ export class FoodService extends BaseService {
             .setCreatedAt(getUnixFromDate(data.createdAt))
             .setUpdatedAt(getUnixFromDate(data.updatedAt))
             .setVersion(data.version)
+            .setVisible(data.visible)
+    }
+
+    list = async (options: ListOptions): Promise<ListFoodDto> => {
+        // find
+        const data = await this.foodRepo.find(options)
+
+        // compose
+        return this.composeListFoodDto(data, options)
+    }
+
+    private composeListFoodDto = (foods: FoodAttributes[], options: ListOptions): ListFoodDto => {
+        const listFoodDto = new ListFoodDto()
+        for (const val of foods) {
+            listFoodDto.addFoods(this.composeFoodDto(val))
+        }
+        const listMetadata = new ListMetadata()
+            .setLimit(options.getLimit())
+            .setSkip(options.getSkip())
+            .setSortBy(options.getSortBy())
+        listFoodDto.setMetadata(listMetadata)
+
+        return listFoodDto
     }
 }

@@ -3,6 +3,7 @@ import { FoodDto } from '../../../proto_gen/food_pb'
 import { FoodAttributes, FoodCreationAttributes } from '../../../src/models/food.model'
 import { ObjectId } from 'mongodb'
 import crypto from 'crypto'
+import { ListOptions } from '../../../proto_gen/common_pb'
 
 describe('FoodService.create Test', () => {
     test('Should throw error invalid args', () => {
@@ -90,6 +91,7 @@ describe('FoodService.getById Test', () => {
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     version: 1,
+                    visible: true,
                 }
             }
         )
@@ -99,5 +101,45 @@ describe('FoodService.getById Test', () => {
         const foodResult = await app.service.foodService.getById(id)
 
         expect(foodResult.getId()).toBe(id)
+    })
+})
+
+describe('FoodService.getById Test', () => {
+    test("Should return list food", async () => {
+        // prepare service
+        const app = new App()
+        app.service.init(app)
+
+        // mock repo
+        const sampleData = {
+            _id: new ObjectId(crypto.randomBytes(12).toString('hex')),
+            name: 'Food 1',
+            images: [],
+            price: 10000,
+            qty: 10,
+            detail: {
+                calories: 100,
+                sugar: 5,
+                vitamin: {},
+            },
+            createdAt: new Date('2023-10-10'), // 1696896000
+            updatedAt: new Date('2023-11-04'), // 1699056000
+            version: 1,
+            visible: true,
+        }
+        jest.spyOn(app.repository.foodRepo, 'find').mockImplementation(
+            async () => {
+                return [sampleData]
+            }
+        )
+
+        // prepare payload
+        const options = new ListOptions()
+        options.setLimit(15)
+
+        // execute
+        const list = await app.service.foodService.list(options)
+        expect(list.getFoodsList().at(0)?.getId()).toBe(sampleData._id.toString())
+        expect(list.getMetadata()?.getLimit()).toBe(options.getLimit())
     })
 })
