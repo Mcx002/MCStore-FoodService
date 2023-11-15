@@ -1,6 +1,6 @@
-import { Collection } from 'mongodb'
+import { Collection, ObjectId } from 'mongodb'
 import { BaseRepo } from '../interfaces/repository.interface'
-import { FoodModel } from '../models/food.model'
+import { FoodAttributes, FoodCreationAttributes } from '../models/food.model'
 import { DatabaseModels } from '../models'
 
 export class FoodRepository extends BaseRepo {
@@ -10,8 +10,12 @@ export class FoodRepository extends BaseRepo {
         this.foodCollection = db.foodCollection
     }
 
-    insert = async (data: FoodModel): Promise<void> => {
+    insert = async (data: FoodCreationAttributes): Promise<void> => {
         const { insertedId } = await this.foodCollection.insertOne(data)
         data._id = insertedId
+    }
+
+    findById = async (id: string): Promise<FoodAttributes | null> => {
+        return this.foodCollection.findOne<FoodAttributes>({ _id: new ObjectId(id) })
     }
 }

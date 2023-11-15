@@ -1,7 +1,7 @@
 import { ServerCredentials } from '@grpc/grpc-js'
 import { App } from './app'
 import { appConfig } from './config'
-import { DatabaseModels } from './models'
+import { DatabaseModels, createDatabaseModels } from './models'
 import { loadEnvFile } from './utils/env-parser'
 import { serverLifetime } from './utils/server'
 import { logger } from './logger'
@@ -18,11 +18,7 @@ async function main() {
         const uri = `${appConfig.host}:${port}`
 
         // prepare MongoDB Database Models
-        const dbClient = new MongoClient(
-            `mongodb://${appConfig.dbUsername}:${appConfig.dbPassword}@${appConfig.dbHost}:${appConfig.dbPort}`
-        )
-        const db = dbClient.db(appConfig.dbName)
-        const dbModels = new DatabaseModels(db)
+        const [dbModels, dbClient] = createDatabaseModels()
 
         // init app
         const app = new App()
@@ -41,6 +37,7 @@ async function main() {
                 console.log(`Listening on ${uri}`)
 
                 if (error) {
+                    dbClient.close()
                     logger.error(JSON.stringify(error))
                 }
             }

@@ -1,21 +1,19 @@
-import { appConfig } from '../../../src/config'
-import { DatabaseModels } from '../../../src/models'
-import { FOOD_COLLECTION, FoodModel } from '../../../src/models/food.model'
+import { createDatabaseModels } from '../../../src/models'
+import { FoodCreationAttributes } from '../../../src/models/food.model'
 import { AppRepository } from '../../../src/repositories'
-import { MongoClient } from 'mongodb'
+import crypto from 'crypto'
 
-describe('Repository Food Test', () => {
+describe('FoodRepository.insert Test', () => {
     test('Should insert food to the db', async () => {
-        const dbClient = new MongoClient(
-            `mongodb://${appConfig.dbUsername}:${appConfig.dbPassword}@${appConfig.dbHost}:${appConfig.dbPort}`
-        )
-        const db = dbClient.db(appConfig.dbName)
-        const dbModels = new DatabaseModels(db)
+        // prepare db model
+        const [dbModels, dbClient] = createDatabaseModels()
 
+        // initialize repo
         const repo = new AppRepository()
         repo.init(dbModels)
 
-        const foodModel: FoodModel = {
+        // prepare food creation attr
+        const foodModel: FoodCreationAttributes = {
             name: 'test',
             images: [],
             price: 0,
@@ -25,14 +23,71 @@ describe('Repository Food Test', () => {
                 sugar: 0,
                 vitamin: {},
             },
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            version: 1,
         }
 
+        // execute
         await repo.foodRepo.insert(foodModel)
 
         expect(foodModel._id).toBeDefined()
 
-        await db.collection(FOOD_COLLECTION).deleteOne({ _id: foodModel._id })
+        // closing
+        await dbModels.foodCollection.deleteOne({ _id: foodModel._id })
+        dbClient.close()
+    })
+})
 
+describe("FoodRepository.findOne Test", () => {
+    test("Should return null", async () => {
+        // prepare db
+        const [dbModels] = createDatabaseModels()
+
+        // initialize repo
+        const repo = new AppRepository()
+        repo.init(dbModels)
+
+        // execute
+        const id = crypto.randomBytes(12).toString('hex')
+        const foodResult = await repo.foodRepo.findById(id)
+
+        expect(foodResult).toBeNull()
+    })
+
+    test("Should return food", async () => {
+        // prepare db
+        const [dbModels, dbClient] = createDatabaseModels()
+
+        // initialize repo
+        const repo = new AppRepository()
+        repo.init(dbModels)
+
+        // prepare stored data
+        const foodModel: FoodCreationAttributes = {
+            name: 'test',
+            images: [],
+            price: 0,
+            qty: 0,
+            detail: {
+                calories: 0,
+                sugar: 0,
+                vitamin: {},
+            },
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            version: 1,
+        }
+        const { insertedId } = await dbModels.foodCollection.insertOne(foodModel)
+        foodModel._id = insertedId
+
+        // execute
+        const foodResult = await repo.foodRepo.findById(foodModel._id.toString())
+
+        expect(foodResult?._id).toStrictEqual(foodModel._id)
+
+        // closing
+        await dbModels.foodCollection.deleteOne({ _id: foodModel._id })
         dbClient.close()
     })
 })
