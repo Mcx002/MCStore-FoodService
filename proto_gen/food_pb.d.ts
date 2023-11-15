@@ -5,6 +5,7 @@
 /* eslint-disable */
 
 import * as jspb from "google-protobuf";
+import * as common_pb from "./common_pb";
 
 export class FoodDto extends jspb.Message { 
     getId(): string;
@@ -30,6 +31,8 @@ export class FoodDto extends jspb.Message {
     setUpdatedAt(value: number): FoodDto;
     getVersion(): number;
     setVersion(value: number): FoodDto;
+    getVisible(): boolean;
+    setVisible(value: boolean): FoodDto;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): FoodDto.AsObject;
@@ -52,6 +55,7 @@ export namespace FoodDto {
         createdAt: number,
         updatedAt: number,
         version: number,
+        visible: boolean,
     }
 
 
@@ -83,4 +87,32 @@ export namespace FoodDto {
         }
     }
 
+}
+
+export class ListFoodDto extends jspb.Message { 
+    clearFoodsList(): void;
+    getFoodsList(): Array<FoodDto>;
+    setFoodsList(value: Array<FoodDto>): ListFoodDto;
+    addFoods(value?: FoodDto, index?: number): FoodDto;
+
+    hasMetadata(): boolean;
+    clearMetadata(): void;
+    getMetadata(): common_pb.ListMetadata | undefined;
+    setMetadata(value?: common_pb.ListMetadata): ListFoodDto;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): ListFoodDto.AsObject;
+    static toObject(includeInstance: boolean, msg: ListFoodDto): ListFoodDto.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: ListFoodDto, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ListFoodDto;
+    static deserializeBinaryFromReader(message: ListFoodDto, reader: jspb.BinaryReader): ListFoodDto;
+}
+
+export namespace ListFoodDto {
+    export type AsObject = {
+        foodsList: Array<FoodDto.AsObject>,
+        metadata?: common_pb.ListMetadata.AsObject,
+    }
 }

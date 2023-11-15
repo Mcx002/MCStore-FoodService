@@ -17,6 +17,17 @@ function deserialize_common_Health(buffer_arg) {
   return common_pb.Health.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_common_ListOptions(arg) {
+  if (!(arg instanceof common_pb.ListOptions)) {
+    throw new Error('Expected argument of type common.ListOptions');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_common_ListOptions(buffer_arg) {
+  return common_pb.ListOptions.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_common_PayloadIdString(arg) {
   if (!(arg instanceof common_pb.PayloadIdString)) {
     throw new Error('Expected argument of type common.PayloadIdString');
@@ -37,6 +48,17 @@ function serialize_food_FoodDto(arg) {
 
 function deserialize_food_FoodDto(buffer_arg) {
   return food_pb.FoodDto.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_food_ListFoodDto(arg) {
+  if (!(arg instanceof food_pb.ListFoodDto)) {
+    throw new Error('Expected argument of type food.ListFoodDto');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_food_ListFoodDto(buffer_arg) {
+  return food_pb.ListFoodDto.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_google_protobuf_Empty(arg) {
@@ -84,6 +106,17 @@ var FoodService = exports.FoodService = {
     requestDeserialize: deserialize_common_PayloadIdString,
     responseSerialize: serialize_food_FoodDto,
     responseDeserialize: deserialize_food_FoodDto,
+  },
+  listFood: {
+    path: '/foodSvc.Food/ListFood',
+    requestStream: false,
+    responseStream: false,
+    requestType: common_pb.ListOptions,
+    responseType: food_pb.ListFoodDto,
+    requestSerialize: serialize_common_ListOptions,
+    requestDeserialize: deserialize_common_ListOptions,
+    responseSerialize: serialize_food_ListFoodDto,
+    responseDeserialize: deserialize_food_ListFoodDto,
   },
 };
 
