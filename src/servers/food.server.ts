@@ -7,8 +7,8 @@ import { App } from '../app'
 import { BaseServer } from '../interfaces/server.interface'
 import { logger } from '../logger'
 import { FoodService } from '../services/food.service'
-import { FoodDto } from '../../proto_gen/food_pb'
-import { PayloadIdString } from '../../proto_gen/common_pb'
+import { FoodDto, ListFoodDto } from '../../proto_gen/food_pb'
+import { ListOptions, PayloadIdString } from '../../proto_gen/common_pb'
 
 export class FoodServer extends BaseServer {
     foodService!: FoodService
@@ -42,6 +42,22 @@ export class FoodServer extends BaseServer {
             const foodDto = await this.foodService.getById(payload.getId())
 
             callback(null, foodDto)
+        } catch (e: unknown) {
+            const err = e as ServerErrorResponse
+            logger.error(JSON.stringify(err))
+            callback(err, null)
+        }
+    }
+
+    listFood = async (
+        call: ServerUnaryCall<ListOptions, ListFoodDto>,
+        callback: sendUnaryData<ListFoodDto>
+    ) => {
+        try {
+            const payload = call.request
+            const listFoodDto = await this.foodService.list(payload)
+
+            callback(null, listFoodDto)
         } catch (e: unknown) {
             const err = e as ServerErrorResponse
             logger.error(JSON.stringify(err))

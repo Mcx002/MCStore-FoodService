@@ -20,6 +20,7 @@ export class AppServer extends Server {
 
             createFood: this.foodServer.createFood,
             getFoodById: this.foodServer.getFoodById,
+            listFood: this.foodServer.listFood,
         })
     }
 }
