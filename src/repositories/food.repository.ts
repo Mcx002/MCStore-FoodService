@@ -1,4 +1,4 @@
-import { Collection, Filter, ObjectId } from 'mongodb'
+import { Collection, Filter, MatchKeysAndValues, ObjectId, UpdateFilter } from 'mongodb'
 import { BaseRepo } from '../interfaces/repository.interface'
 import { FoodAttributes, FoodCreationAttributes, FoodModel } from '../models/food.model'
 import { DatabaseModels } from '../models'
@@ -127,5 +127,15 @@ export class FoodRepository extends BaseRepo {
         if (visible) {
             filter.visible = stringToBool(visible, true)
         }
+    }
+
+    update = async (id: ObjectId, updatedValue: MatchKeysAndValues<FoodModel>, version: number): Promise<number> => {
+        const { modifiedCount } = await this.foodCollection.updateOne({
+            _id: id,
+            version
+        }, {
+            $set: updatedValue,
+        })
+        return modifiedCount
     }
 }

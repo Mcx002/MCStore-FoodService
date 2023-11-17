@@ -1,6 +1,6 @@
-import { MongoClient } from 'mongodb'
+import { MatchKeysAndValues, MongoClient, UpdateFilter } from 'mongodb'
 import { DatabaseModels, createDatabaseModels } from '../../../src/models'
-import { FoodCreationAttributes } from '../../../src/models/food.model'
+import { FoodCreationAttributes, FoodModel } from '../../../src/models/food.model'
 import { AppRepository } from '../../../src/repositories'
 import crypto from 'crypto'
 import { ListOptions, SortBy } from '../../../proto_gen/common_pb'
@@ -147,6 +147,21 @@ describe("FoodRepository.find Test", () => {
             updatedAt: new Date('2023-11-03'), // 1698969600
             version: 1,
             visible: false,
+        }, {
+            name: 'Food 4',
+            images: [],
+            price: 26000,
+            qty: 5,
+            detail: {
+                calories: 400,
+                sugar: 12,
+                vitamin: {},
+            },
+            createdAt: new Date('2023-10-25'), // 1698192000
+            updatedAt: new Date('2023-11-03'), // 1698969600
+            version: 1,
+            visible: false,
+            deletedAt: new Date('2022-11-05')
         }])
     })
 
@@ -461,5 +476,72 @@ describe("FoodRepository.find Test", () => {
         const result = await repo.foodRepo.find(listOptions)
         expect(result.length).toBe(2)
         expect(result[0].name).toBe("Food 1")
+    })
+
+    test("Should return withDeletedAt", async () => {
+        // initialize repo
+        const repo = new AppRepository()
+        repo.init(dbModels)
+
+        // prepare payload
+        const listOptions = new ListOptions()
+        listOptions.getFilterMap()
+            .set("withDeletedData", "true")
+
+        // execution
+        const result = await repo.foodRepo.find(listOptions)
+        expect(result.length).toBe(4)
+        expect(result[0].name).toBe("Food 1")
+    })
+})
+
+describe('FoodRepository.update Test', () => {
+    test('Should modified 1 document', async () => {
+        // prepare db model
+        const [dbModels, dbClient] = createDatabaseModels()
+
+        // initialize repo
+        const repo = new AppRepository()
+        repo.init(dbModels)
+
+        // prepare food data
+        const foodModel: FoodCreationAttributes = {
+            name: 'test',
+            images: [],
+            price: 0,
+            qty: 0,
+            detail: {
+                calories: 0,
+                sugar: 0,
+                vitamin: {},
+            },
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            version: 1,
+            visible: false,
+        }
+
+        const { insertedId: id } = await dbModels.foodCollection.insertOne(foodModel)
+
+        // prepare updated value
+        const updatedValue: MatchKeysAndValues<FoodModel> = {
+            name: "Test",
+            "detail.calories": 10,
+            version: foodModel.version + 1,
+        }
+
+        // execute update
+        await repo.foodRepo.update(id, updatedValue, foodModel.version)
+
+        // get updatedFoodModel
+        const updatedFoodModel = await dbModels.foodCollection.findOne({ _id: id })
+
+        expect(updatedFoodModel?.version).toBe(foodModel.version + 1)
+        expect(updatedFoodModel?.detail.calories).toBe(updatedValue["detail.calories"])
+        expect(updatedFoodModel?.name).toBe(updatedValue.name)
+
+        // closing
+        await dbModels.foodCollection.deleteOne({ _id: foodModel._id })
+        dbClient.close()
     })
 })
