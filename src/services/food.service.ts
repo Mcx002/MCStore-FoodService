@@ -1,12 +1,13 @@
 import { App } from '../app'
 import { BaseService } from '../interfaces/service.interface'
-import { FoodAttributes, FoodCreationAttributes } from '../models/food.model'
+import { FoodAttributes, FoodCreationAttributes, FoodModel } from '../models/food.model'
 import { FoodRepository } from '../repositories/food.repository'
 import { FoodDto, ListFoodDto } from '../../proto_gen/food_pb'
 import { ErrorHandler } from '../adapter/error.adapter'
 import { Status } from '@grpc/grpc-js/build/src/constants'
 import { getUnixFromDate } from '../utils/time'
 import { ListMetadata, ListOptions } from '../../proto_gen/common_pb'
+import { MatchKeysAndValues } from 'mongodb'
 
 export class FoodService extends BaseService {
     foodRepo!: FoodRepository
@@ -110,5 +111,56 @@ export class FoodService extends BaseService {
         listFoodDto.setMetadata(listMetadata)
 
         return listFoodDto
+    }
+
+    update = async (payload: FoodDto): Promise<FoodDto> => {
+        // find food by id
+        const food = await this.foodRepo.findById(payload.getId())
+        if (!food) {
+            throw new ErrorHandler(Status.INVALID_ARGUMENT, `Food with id: ${payload.getId()}, not found`)
+        }
+
+        if (payload.getVersion() !== food.version) {
+            throw new ErrorHandler(Status.INVALID_ARGUMENT, "Stale version")
+        }
+
+        const vitamin: Record<string, number> = {}
+        for (const [key, val] of payload.getDetail()!.getVitaminMap().toObject()) {
+            vitamin[key] = val
+        }
+
+        // prepare updated value
+        const updatedValue: MatchKeysAndValues<FoodModel> = {
+            name: payload.getName(),
+            price: payload.getPrice(),
+            qty: payload.getQty(),
+            images: payload.getImagesList(),
+            "detail.calories": payload.getDetail()!.getCalories(),
+            "detail.sugar": payload.getDetail()!.getSugar(),
+            "detail.vitamin": vitamin,
+            visible: payload.getVisible(),
+            version: food.version + 1,
+            updatedAt: new Date(),
+        }
+
+        // execute update
+        const count = await this.foodRepo.update(food._id, updatedValue, payload.getVersion())
+        if (count === 0) {
+            throw new ErrorHandler(Status.INTERNAL, "No document updated")
+        }
+
+        // update food model
+        food.name = updatedValue.name!
+        food.price = updatedValue.price!
+        food.qty = updatedValue.qty!
+        food.images = updatedValue.images!
+        food.detail.calories = updatedValue["detail.calories"]!
+        food.detail.sugar = updatedValue["detail.sugar"]!
+        food.detail.vitamin = updatedValue["detail.vitamin"]!
+        food.visible = updatedValue.visible!
+        food.version = updatedValue.version!
+        food.updatedAt = updatedValue.updatedAt!
+
+        return this.composeFoodDto(food)
     }
 }
