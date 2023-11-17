@@ -15,6 +15,7 @@ interface IFoodService extends grpc.ServiceDefinition<grpc.UntypedServiceImpleme
     createFood: IFoodService_ICreateFood;
     getFoodById: IFoodService_IGetFoodById;
     listFood: IFoodService_IListFood;
+    updateFood: IFoodService_IUpdateFood;
 }
 
 interface IFoodService_IGetHealth extends grpc.MethodDefinition<google_protobuf_empty_pb.Empty, common_pb.Health> {
@@ -53,6 +54,15 @@ interface IFoodService_IListFood extends grpc.MethodDefinition<common_pb.ListOpt
     responseSerialize: grpc.serialize<food_pb.ListFoodDto>;
     responseDeserialize: grpc.deserialize<food_pb.ListFoodDto>;
 }
+interface IFoodService_IUpdateFood extends grpc.MethodDefinition<food_pb.FoodDto, food_pb.FoodDto> {
+    path: "/foodSvc.Food/UpdateFood";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<food_pb.FoodDto>;
+    requestDeserialize: grpc.deserialize<food_pb.FoodDto>;
+    responseSerialize: grpc.serialize<food_pb.FoodDto>;
+    responseDeserialize: grpc.deserialize<food_pb.FoodDto>;
+}
 
 export const FoodService: IFoodService;
 
@@ -61,6 +71,7 @@ export interface IFoodServer extends grpc.UntypedServiceImplementation {
     createFood: grpc.handleUnaryCall<food_pb.FoodDto, food_pb.FoodDto>;
     getFoodById: grpc.handleUnaryCall<common_pb.PayloadIdString, food_pb.FoodDto>;
     listFood: grpc.handleUnaryCall<common_pb.ListOptions, food_pb.ListFoodDto>;
+    updateFood: grpc.handleUnaryCall<food_pb.FoodDto, food_pb.FoodDto>;
 }
 
 export interface IFoodClient {
@@ -76,6 +87,9 @@ export interface IFoodClient {
     listFood(request: common_pb.ListOptions, callback: (error: grpc.ServiceError | null, response: food_pb.ListFoodDto) => void): grpc.ClientUnaryCall;
     listFood(request: common_pb.ListOptions, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: food_pb.ListFoodDto) => void): grpc.ClientUnaryCall;
     listFood(request: common_pb.ListOptions, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: food_pb.ListFoodDto) => void): grpc.ClientUnaryCall;
+    updateFood(request: food_pb.FoodDto, callback: (error: grpc.ServiceError | null, response: food_pb.FoodDto) => void): grpc.ClientUnaryCall;
+    updateFood(request: food_pb.FoodDto, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: food_pb.FoodDto) => void): grpc.ClientUnaryCall;
+    updateFood(request: food_pb.FoodDto, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: food_pb.FoodDto) => void): grpc.ClientUnaryCall;
 }
 
 export class FoodClient extends grpc.Client implements IFoodClient {
@@ -92,4 +106,7 @@ export class FoodClient extends grpc.Client implements IFoodClient {
     public listFood(request: common_pb.ListOptions, callback: (error: grpc.ServiceError | null, response: food_pb.ListFoodDto) => void): grpc.ClientUnaryCall;
     public listFood(request: common_pb.ListOptions, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: food_pb.ListFoodDto) => void): grpc.ClientUnaryCall;
     public listFood(request: common_pb.ListOptions, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: food_pb.ListFoodDto) => void): grpc.ClientUnaryCall;
+    public updateFood(request: food_pb.FoodDto, callback: (error: grpc.ServiceError | null, response: food_pb.FoodDto) => void): grpc.ClientUnaryCall;
+    public updateFood(request: food_pb.FoodDto, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: food_pb.FoodDto) => void): grpc.ClientUnaryCall;
+    public updateFood(request: food_pb.FoodDto, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: food_pb.FoodDto) => void): grpc.ClientUnaryCall;
 }

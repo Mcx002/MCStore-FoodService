@@ -118,6 +118,17 @@ var FoodService = exports.FoodService = {
     responseSerialize: serialize_food_ListFoodDto,
     responseDeserialize: deserialize_food_ListFoodDto,
   },
+  updateFood: {
+    path: '/foodSvc.Food/UpdateFood',
+    requestStream: false,
+    responseStream: false,
+    requestType: food_pb.FoodDto,
+    responseType: food_pb.FoodDto,
+    requestSerialize: serialize_food_FoodDto,
+    requestDeserialize: deserialize_food_FoodDto,
+    responseSerialize: serialize_food_FoodDto,
+    responseDeserialize: deserialize_food_FoodDto,
+  },
 };
 
 exports.FoodClient = grpc.makeGenericClientConstructor(FoodService);
