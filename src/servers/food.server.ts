@@ -64,4 +64,20 @@ export class FoodServer extends BaseServer {
             callback(err, null)
         }
     }
+
+    updateFood = async (
+        call: ServerUnaryCall<FoodDto, FoodDto>,
+        callback: sendUnaryData<FoodDto>
+    ) => {
+        try {
+            const payload = call.request
+            const foodDto = await this.foodService.update(payload)
+
+            callback(null, foodDto)
+        } catch (e: unknown) {
+            const err = e as ServerErrorResponse
+            logger.error(JSON.stringify(err))
+            callback(err, null)
+        }
+    }
 }
