@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.0
+
+- feat(food): Add update food service
+
 ## v0.4.0
 
 - feat(food): Add list food service
